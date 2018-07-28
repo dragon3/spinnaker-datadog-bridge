@@ -19,7 +19,9 @@ type Details struct {
 // Content is the main context of the given Webhook. It contains of the execution
 // information and stage details as an example
 type Content struct {
-	ExecutionID string    `json:"executionId"`
-	StartTime   Timestamp `json:"startTime"`
-	EndTime     Timestamp `json:"endTime"`
+	ExecutionID string      `json:"executionId"`
+	StartTime   Timestamp   `json:"startTime"`
+	EndTime     Timestamp   `json:"endTime"`
+	Execution   interface{} `json:"execution,omitempty"`
+	Context     interface{} `json:"context,omitempty"`
 }
