@@ -55,12 +55,15 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 	event.SetText(textBuf.String())
 	event.SetAggregation(incoming.Content.ExecutionID)
 	eventTypeDetails := strings.Split(incoming.Details.Type, ":")
+	eventType := eventTypeDetails[1]
 	eventStatus := eventTypeDetails[2]
 
 	event.Tags = []string{
+		"origin:spinnaker",
 		fmt.Sprintf("app:%s", incoming.Details.Application),
+		fmt.Sprintf("event_status:%s", eventStatus),
+		fmt.Sprintf("event_type:%s", eventType),
 		incoming.Details.Type,
-		eventStatus,
 	}
 
 	for _, tag := range deh.template.compiledTags {
