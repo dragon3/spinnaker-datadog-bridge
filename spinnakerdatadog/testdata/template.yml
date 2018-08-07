@@ -3,3 +3,5 @@ orca:stage:complete:
   text: |
     Started at: {{ .Content.StartTime }}
     Finished at: {{ .Content.EndTime }}
+  tags:
+    - "status:{{ .Content.Execution.Status }}"

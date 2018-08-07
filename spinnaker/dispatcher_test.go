@@ -54,6 +54,56 @@ func TestDispatcherHandlesRequests(t *testing.T) {
 			},
 		},
 		{
+			scenario:        "Webhook JSON is valid and dispatches the hook with a known trigger payload",
+			requestBodyFile: "valid-webhook.json",
+			hookType:        "orca:stage:complete",
+			mockFactory: func(ctrl *gomock.Controller, t *testing.T) *mocks.MockHandler {
+				m := mocks.NewMockHandler(ctrl)
+				m.EXPECT().Handle(gomock.Any()).Do(func(incoming *types.IncomingWebhook) {
+					assert.Equal(t, "user@email.com", incoming.Content.Execution.Trigger.User)
+				})
+				m.EXPECT().Name().Return("MockHandler")
+
+				return m
+			},
+			assertion: func(d *spinnaker.Dispatcher, req *http.Request, t *testing.T) {
+				results, err := d.HandleIncomingRequest(req)
+				require.NoError(t, err)
+
+				select {
+				case result := <-results:
+					require.NoError(t, result.Err)
+				case <-time.After(time.Millisecond * 100):
+					t.Error("channel never closed")
+				}
+			},
+		},
+		{
+			scenario:        "Webhook JSON is valid and dispatches the hook with a know status in the payload",
+			requestBodyFile: "valid-webhook.json",
+			hookType:        "orca:stage:complete",
+			mockFactory: func(ctrl *gomock.Controller, t *testing.T) *mocks.MockHandler {
+				m := mocks.NewMockHandler(ctrl)
+				m.EXPECT().Handle(gomock.Any()).Do(func(incoming *types.IncomingWebhook) {
+					assert.Equal(t, "TERMINAL", incoming.Content.Execution.Status)
+				})
+				m.EXPECT().Name().Return("MockHandler")
+
+				return m
+			},
+			assertion: func(d *spinnaker.Dispatcher, req *http.Request, t *testing.T) {
+				results, err := d.HandleIncomingRequest(req)
+				require.NoError(t, err)
+
+				select {
+				case result := <-results:
+					require.NoError(t, result.Err)
+				case <-time.After(time.Millisecond * 100):
+					t.Error("channel never closed")
+				}
+			},
+		},
+		{
 			scenario:        "The handler fails to handle the incoming webhook",
 			requestBodyFile: "valid-webhook.json",
 			hookType:        "orca:stage:complete",

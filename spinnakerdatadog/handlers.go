@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ghodss/yaml"
 	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker"
+	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	datadog "gopkg.in/zorkian/go-datadog-api.v2"
 )
@@ -21,11 +21,13 @@ type Spout struct {
 // EventTemplate is the representation in the template file
 // before parsing it
 type EventTemplate struct {
-	Title string `json:"title,omitempty"`
-	Text  string `json:"text,omitempty"`
+	Title string   `json:"title,omitempty"`
+	Text  string   `json:"text,omitempty"`
+	Tags  []string `json:"tags,omitempty"`
 
 	compiledTitle *template.Template
 	compiledText  *template.Template
+	compiledTags  []*template.Template
 	isCompiled    bool
 }
 
@@ -43,6 +45,15 @@ func (et *EventTemplate) Compile() error {
 	et.compiledText, err = template.New("eventText").Parse(et.Text)
 	if err != nil {
 		return errors.Wrap(err, "could not compile eventText")
+	}
+	var tags []*template.Template
+	for _, tag := range et.Tags {
+		compiledTag, err := template.New("eventTags").Parse(tag)
+		if err != nil {
+			return errors.Wrap(err, "could not compile eventTags")
+		}
+		tags = append(tags, compiledTag)
+		et.compiledTags = tags
 	}
 
 	return err

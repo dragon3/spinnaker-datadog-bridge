@@ -1,3 +1,4 @@
 samples/
 vendor/
 !vendor/vendor.json
+.vscode
