@@ -61,8 +61,8 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 	event.Tags = []string{
 		"origin:spinnaker",
 		fmt.Sprintf("app:%s", incoming.Details.Application),
-		fmt.Sprintf("event_status:%s", eventStatus),
-		fmt.Sprintf("event_type:%s", eventType),
+		fmt.Sprintf("status:%s", eventStatus),
+		fmt.Sprintf("type:%s", eventType),
 		incoming.Details.Type,
 	}
 
