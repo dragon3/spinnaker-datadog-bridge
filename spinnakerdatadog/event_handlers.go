@@ -66,6 +66,10 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 		incoming.Details.Type,
 	}
 
+	if eventStatus == "failed" {
+		event.SetAlertType("error")
+	}
+
 	for _, tag := range deh.template.compiledTags {
 		tagBuf := new(bytes.Buffer)
 		if err := tag.Execute(tagBuf, incoming); err != nil {
