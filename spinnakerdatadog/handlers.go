@@ -53,9 +53,8 @@ func (et *EventTemplate) Compile() error {
 			return errors.Wrap(err, "could not compile eventTags")
 		}
 		tags = append(tags, compiledTag)
-		et.compiledTags = tags
 	}
-
+	et.compiledTags = tags
 	return err
 }
 
