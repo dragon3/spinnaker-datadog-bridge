@@ -92,11 +92,13 @@ func TestEventDispatcherSendsDataDogFormattedEvents(t *testing.T) {
 
 		assert.Equal(t, "someapp doing something", event.GetTitle())
 		assert.Equal(t, "someid is the execution id", event.GetText())
-		assert.Equal(t, "app:someapp", event.Tags[0])
-		assert.Equal(t, "orca:stage:failed", event.Tags[1])
-		assert.Equal(t, "failed", event.Tags[2])
-		assert.Equal(t, "pipelineConfigId:c6f20df7-f9ab-45b5-b525-9a67ef2e95b5", event.Tags[3])
-		assert.Equal(t, "status:TERMINAL", event.Tags[4])
+		assert.Equal(t, "origin:spinnaker", event.Tags[0])
+		assert.Equal(t, "app:someapp", event.Tags[1])
+		assert.Equal(t, "event_status:failed", event.Tags[2])
+		assert.Equal(t, "event_type:stage", event.Tags[3])
+		assert.Equal(t, "orca:stage:failed", event.Tags[4])
+		assert.Equal(t, "pipelineConfigId:c6f20df7-f9ab-45b5-b525-9a67ef2e95b5", event.Tags[5])
+		assert.Equal(t, "status:TERMINAL", event.Tags[6])
 	case <-time.After(time.Millisecond * 100):
 		t.Error("timed out waiting for webhook call")
 	}
