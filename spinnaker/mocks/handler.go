@@ -5,7 +5,7 @@
 package mocks
 
 import (
-	types "github.com/bobbytables/spinnaker-datadog-bridge/spinnaker/types"
+	types "github.com/DataDog/spinnaker-datadog-bridge/spinnaker/types"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
