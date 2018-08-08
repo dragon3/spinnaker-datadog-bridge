@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker"
+	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker"
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	datadog "gopkg.in/zorkian/go-datadog-api.v2"

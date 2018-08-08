@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker/types"
+	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker/types"
 )
 
 // Handler defines an interface to allow you to implement your own handlers
