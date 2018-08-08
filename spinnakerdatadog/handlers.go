@@ -46,15 +46,14 @@ func (et *EventTemplate) Compile() error {
 	if err != nil {
 		return errors.Wrap(err, "could not compile eventText")
 	}
-	var tags []*template.Template
+
 	for _, tag := range et.Tags {
 		compiledTag, err := template.New("eventTags").Parse(tag)
 		if err != nil {
 			return errors.Wrap(err, "could not compile eventTags")
 		}
-		tags = append(tags, compiledTag)
+		et.compiledTags = append(et.compiledTags, compiledTag)
 	}
-	et.compiledTags = tags
 	return err
 }
 
