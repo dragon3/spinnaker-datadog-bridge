@@ -65,7 +65,7 @@ func TestEventDispatcherSendsDataDogFormattedEvents(t *testing.T) {
 		Text:  "{{ .Content.ExecutionID }} is the execution id",
 		Tags: []string{
 			"pipelineConfigId:{{ .Content.Execution.PipelineConfigID }}",
-			"status:{{ .Content.Execution.Status }}",
+			"execution_status:{{ .Content.Execution.Status }}",
 		},
 	}
 
@@ -98,7 +98,7 @@ func TestEventDispatcherSendsDataDogFormattedEvents(t *testing.T) {
 		assert.Equal(t, "type:stage", event.Tags[3])
 		assert.Equal(t, "orca:stage:failed", event.Tags[4])
 		assert.Equal(t, "pipelineConfigId:c6f20df7-f9ab-45b5-b525-9a67ef2e95b5", event.Tags[5])
-		assert.Equal(t, "status:TERMINAL", event.Tags[6])
+		assert.Equal(t, "execution_status:TERMINAL", event.Tags[6])
 	case <-time.After(time.Millisecond * 100):
 		t.Error("timed out waiting for webhook call")
 	}
