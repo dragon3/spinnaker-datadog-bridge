@@ -34,6 +34,43 @@
         "endTime": 1518214003420
       }
     },
+    "execution": {
+      "application": "hcm",
+      "authentication": {
+        "allowedAccounts": [
+          "test-acct"
+        ],
+        "user": "user@email.com"
+      },
+      "buildTime": 1533227762716,
+      "canceled": false,
+      "canceledBy": "user@email.com",
+      "endTime": 1533315813272,
+      "id": "01CKXQY10WBZXQ962RDTMPJ1H5",
+      "initialConfig": {},
+      "keepWaitingPipelines": false,
+      "limitConcurrent": true,
+      "name": "hcm pipeline",
+      "notifications": [],
+      "origin": "deck",
+      "pipelineConfigId": "c6f20df7-f9ab-45b5-b525-9a67ef2e95b5",
+      "stages": [],
+      "startTime": 1533227762737,
+      "status": "TERMINAL",
+      "systemNotifications": [],
+      "trigger": {
+        "artifacts": [],
+        "dryRun": false,
+        "notifications": [],
+        "parameters": {},
+        "rebake": false,
+        "resolvedExpectedArtifacts": [],
+        "strategy": false,
+        "type": "manual",
+        "user": "user@email.com"
+      },
+      "type": "PIPELINE"
+    },
     "startTime": 1518214003091,
     "endTime": 1518214003420,
     "executionId": "88ebc19f-43bc-460c-9de5-2347b48f8efb"

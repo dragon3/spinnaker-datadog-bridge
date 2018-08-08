@@ -3,6 +3,7 @@ package spinnakerdatadog
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker"
 	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker/types"
@@ -53,9 +54,28 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 	event.SetTitle(titleBuf.String())
 	event.SetText(textBuf.String())
 	event.SetAggregation(incoming.Content.ExecutionID)
+	eventTypeDetails := strings.Split(incoming.Details.Type, ":")
+	eventType := eventTypeDetails[1]
+	eventStatus := eventTypeDetails[2]
+
 	event.Tags = []string{
+		"origin:spinnaker",
 		fmt.Sprintf("app:%s", incoming.Details.Application),
+		fmt.Sprintf("status:%s", eventStatus),
+		fmt.Sprintf("type:%s", eventType),
 		incoming.Details.Type,
+	}
+
+	if eventStatus == "failed" {
+		event.SetAlertType("error")
+	}
+
+	for _, tag := range deh.template.compiledTags {
+		tagBuf := new(bytes.Buffer)
+		if err := tag.Execute(tagBuf, incoming); err != nil {
+			return errors.Wrap(err, "could not compile tags from webhook")
+		}
+		event.Tags = append(event.Tags, tagBuf.String())
 	}
 
 	if _, err := deh.spout.client.PostEvent(event); err != nil {
