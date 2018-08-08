@@ -5,9 +5,10 @@
 package mocks
 
 import (
-	types "github.com/bobbytables/spinnaker-datadog-bridge/spinnaker/types"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	types "github.com/DataDog/spinnaker-datadog-bridge/spinnaker/types"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockHandler is a mock of Handler interface
