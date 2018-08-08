@@ -8,9 +8,9 @@ import (
 	"github.com/urfave/cli"
 	datadog "gopkg.in/zorkian/go-datadog-api.v2"
 
-	"github.com/bobbytables/spinnaker-datadog-bridge/server"
-	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker"
-	"github.com/bobbytables/spinnaker-datadog-bridge/spinnakerdatadog"
+	"github.com/DataDog/spinnaker-datadog-bridge/server"
+	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker"
+	"github.com/DataDog/spinnaker-datadog-bridge/spinnakerdatadog"
 )
 
 func main() {

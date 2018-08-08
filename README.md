@@ -26,6 +26,9 @@ orca:stage:complete:
   text: |
     Started at: {{ .Content.StartTime }}
     Finished at: {{ .Content.EndTime }}
+  tags:
+    - "triggered_by:{{ .Content.Execution.Trigger.User }}"
+    - "pipeline_id:{{ .Content.Execution.PipelineConfigID }}"
 ```
 
 The key `orca:stage:complete` is the mapping between a Spinnaker event and the given template for title and text. The title and text are what are displayed inside of DataDog. You have access to all of the properties defined in the [IncomingWebhook Struct](spinnaker/types/webhooks.go).

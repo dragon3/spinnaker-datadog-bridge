@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
-	"github.com/bobbytables/spinnaker-datadog-bridge/spinnaker"
+	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker"
 )
 
 // Server handles incoming webhook requests and pushes them to a dispatcher
