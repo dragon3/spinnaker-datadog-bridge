@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/DataDog/spinnaker-datadog-bridge"
-  packages = ["server","spinnaker","spinnaker/mocks","spinnaker/types","spinnakerdatadog"]
-  revision = "d09eff39ba5b24b5901f0a6bd8dcb68d27c54426"
-
-[[projects]]
   name = "github.com/cenkalti/backoff"
   packages = ["."]
   revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
@@ -106,6 +100,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "60955525f9fac71c91f1736767e3b50dc238d64f73b80b2b9f7fb72204c886de"
+  inputs-digest = "7b1ee531c1b701b46fbed339059f117081480002a77897651f922d4240a57bc6"
   solver-name = "gps-cdcl"
   solver-version = 1
