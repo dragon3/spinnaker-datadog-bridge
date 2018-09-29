@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	dogstatsd "github.com/DataDog/datadog-go/statsd"
 	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker"
 	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker/types"
 	"github.com/pkg/errors"
-	datadog "gopkg.in/zorkian/go-datadog-api.v2"
+	"github.com/sirupsen/logrus"
+	datadogAPI "gopkg.in/zorkian/go-datadog-api.v2"
 )
 
 // DatadogEventHandler handles piping all of the registered events (via templates)
@@ -50,7 +52,14 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 		return errors.Wrap(err, "could not compile text from webhook")
 	}
 
-	event := &datadog.Event{}
+	ddClient, err := dogstatsd.New("127.0.0.1:8125")
+	if err != nil {
+		return errors.Wrap(err, "could not open connection to dogstatsd")
+	}
+
+	ddClient.Namespace = "spinnaker."
+
+	event := &datadogAPI.Event{}
 	event.SetTitle(titleBuf.String())
 	event.SetText(textBuf.String())
 	event.SetAggregation(incoming.Content.ExecutionID)
@@ -58,12 +67,38 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 	eventType := eventTypeDetails[1]
 	eventStatus := eventTypeDetails[2]
 
-	event.Tags = []string{
+	tags := []string{
 		"origin:spinnaker",
 		fmt.Sprintf("app:%s", incoming.Details.Application),
 		fmt.Sprintf("status:%s", eventStatus),
 		fmt.Sprintf("type:%s", eventType),
 		incoming.Details.Type,
+	}
+
+	event.Tags = tags
+
+	if eventType == "pipeline" && eventStatus != "starting" {
+		metricTags := []string{
+			fmt.Sprintf("execution_id:%s", incoming.Content.ExecutionID),
+			fmt.Sprintf("triggered_by:%s", incoming.Content.Execution.Trigger.User),
+			fmt.Sprintf("pipeline_name:%s", incoming.Content.Execution.Name),
+		}
+		metricTags = append(metricTags, tags...)
+
+		duration := incoming.Content.Execution.EndTime.Sub(incoming.Content.Execution.StartTime.Time)
+		err = ddClient.Timing("pipeline.duration", duration, metricTags, 1)
+
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("error submitting metric to datadog")
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"metric":   "pipeline.duration",
+				"tags":     metricTags,
+				"duration": duration.Seconds() * 1000,
+			}).Info("submitted metric to datadog")
+		}
 	}
 
 	if eventStatus == "failed" {
