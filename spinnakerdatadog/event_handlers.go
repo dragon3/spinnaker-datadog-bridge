@@ -79,7 +79,6 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 
 	if eventType == "pipeline" && eventStatus != "starting" {
 		metricTags := []string{
-			fmt.Sprintf("execution_id:%s", incoming.Content.ExecutionID),
 			fmt.Sprintf("triggered_by:%s", incoming.Content.Execution.Trigger.User),
 			fmt.Sprintf("pipeline_name:%s", incoming.Content.Execution.Name),
 		}
