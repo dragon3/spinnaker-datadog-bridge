@@ -64,40 +64,19 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 	event.SetText(textBuf.String())
 	event.SetAggregation(incoming.Content.ExecutionID)
 	eventTypeDetails := strings.Split(incoming.Details.Type, ":")
+	if len(eventTypeDetails) < 3 {
+		return errors.New("could not extract event type details from webhook")
+	}
+
 	eventType := eventTypeDetails[1]
 	eventStatus := eventTypeDetails[2]
 
-	tags := []string{
+	event.Tags = []string{
 		"origin:spinnaker",
 		fmt.Sprintf("app:%s", incoming.Details.Application),
 		fmt.Sprintf("status:%s", eventStatus),
 		fmt.Sprintf("type:%s", eventType),
 		incoming.Details.Type,
-	}
-
-	event.Tags = tags
-
-	if eventType == "pipeline" && eventStatus != "starting" {
-		metricTags := []string{
-			fmt.Sprintf("triggered_by:%s", incoming.Content.Execution.Trigger.User),
-			fmt.Sprintf("pipeline_name:%s", incoming.Content.Execution.Name),
-		}
-		metricTags = append(metricTags, tags...)
-
-		duration := incoming.Content.Execution.EndTime.Sub(incoming.Content.Execution.StartTime.Time)
-		err = ddClient.Timing("pipeline.duration", duration, metricTags, 1)
-
-		if err != nil {
-			logrus.WithFields(logrus.Fields{
-				"error": err,
-			}).Error("error submitting metric to datadog")
-		} else {
-			logrus.WithFields(logrus.Fields{
-				"metric":   "pipeline.duration",
-				"tags":     metricTags,
-				"duration": duration.Seconds() * 1000,
-			}).Info("submitted metric to datadog")
-		}
 	}
 
 	if eventStatus == "failed" {
@@ -112,9 +91,36 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 		event.Tags = append(event.Tags, tagBuf.String())
 	}
 
+	if eventType == "pipeline" && eventStatus != "starting" {
+		metricTags := []string{
+			fmt.Sprintf("triggered_by:%s", incoming.Content.Execution.Trigger.User),
+			fmt.Sprintf("pipeline_name:%s", incoming.Content.Execution.Name),
+		}
+		event.Tags = append(event.Tags, metricTags...)
+
+		duration := incoming.Content.Execution.EndTime.Sub(incoming.Content.Execution.StartTime.Time)
+		err = ddClient.Timing("pipeline.duration", duration, event.Tags, 1)
+
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("error submitting metric to datadog")
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"metric":   "pipeline.duration",
+				"tags":     event.Tags,
+				"duration": duration.Seconds() * 1000,
+			}).Info("submitted metric to datadog")
+		}
+	}
+
 	if _, err := deh.spout.client.PostEvent(event); err != nil {
 		return errors.Wrap(err, "could not post to datadog API")
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"tags": event.Tags,
+	}).Info("submitted event to datadog")
 
 	return nil
 }

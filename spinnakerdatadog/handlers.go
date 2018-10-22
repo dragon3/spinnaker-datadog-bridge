@@ -3,7 +3,6 @@ package spinnakerdatadog
 import (
 	"html/template"
 	"io/ioutil"
-	"os"
 
 	"github.com/DataDog/spinnaker-datadog-bridge/spinnaker"
 	"github.com/ghodss/yaml"
@@ -66,11 +65,7 @@ func NewSpout(c *datadog.Client, templateFile string) (*Spout, error) {
 		return spout, nil
 	}
 
-	f, err := os.Open(templateFile)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not open template file")
-	}
-	b, err := ioutil.ReadAll(f)
+	b, err := ioutil.ReadFile(templateFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not read template file")
 	}
