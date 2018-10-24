@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/DataDog/datadog-go"
+  packages = ["statsd"]
+  revision = "e67964b4021ad3a334e748e8811eb3cd6becbc6e"
+  version = "2.1.0"
+
+[[projects]]
   name = "github.com/cenkalti/backoff"
   packages = ["."]
   revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
@@ -100,6 +106,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7b1ee531c1b701b46fbed339059f117081480002a77897651f922d4240a57bc6"
+  inputs-digest = "b0a0c1a72d037a8f895acd14ba010bf5c4f3937141de31ddac234d203a521e9e"
   solver-name = "gps-cdcl"
   solver-version = 1
