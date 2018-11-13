@@ -299,7 +299,7 @@ func TestEventDispatcherWithBadEventType(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestEventDispatcherAddsTagsForPipelineExec(t *testing.T) {
+func TestEventDispatcherRemovesDuplicateTags(t *testing.T) {
 	mux := http.NewServeMux()
 	var event datadog.Event
 	done := make(chan error, 1)
@@ -316,6 +316,8 @@ func TestEventDispatcherAddsTagsForPipelineExec(t *testing.T) {
 		Text:  "{{ .Content.ExecutionID }} is the execution id",
 		Tags: []string{
 			"pipelineConfigId:{{ .Content.Execution.PipelineConfigID }}",
+			"execution_status:{{ .Content.Execution.Status }}",
+			"execution_status:{{ .Content.Execution.Status }}",
 			"execution_status:{{ .Content.Execution.Status }}",
 		},
 	}
@@ -344,8 +346,7 @@ func TestEventDispatcherAddsTagsForPipelineExec(t *testing.T) {
 	select {
 	case err := <-done:
 		require.NoError(t, err, "error handling webhook")
-		assert.Equal(t, "triggered_by:testuser@test.tld", event.Tags[7])
-		assert.Equal(t, "pipeline_name:test-pipeline-name", event.Tags[8])
+		assert.Equal(t, 7, len(event.Tags))
 	case <-time.After(time.Millisecond * 100):
 		t.Error("timed out waiting for webhook call")
 	}
