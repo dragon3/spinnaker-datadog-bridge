@@ -36,6 +36,21 @@ func (deh *DatadogEventHandler) Name() string {
 	return "DatadogEventHandler"
 }
 
+// Remove duplicate tags
+func removeDuplicateTags(tags []string) []string {
+	seen := map[string]bool{}
+	result := []string{}
+
+	for _, item := range tags {
+		if _, ok := seen[item]; !ok {
+			seen[item] = true
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
 // Handle implements spinnaker.Handler. It sends datadog events for the given
 // webhook event type. It compiles the given template from the webhook and sends it
 func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
@@ -91,15 +106,17 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 		event.Tags = append(event.Tags, tagBuf.String())
 	}
 
-	if eventType == "pipeline" && eventStatus != "starting" {
+	event.Tags = removeDuplicateTags(event.Tags)
+
+	if eventType == "pipeline" && eventStatus == "complete" {
 		metricTags := []string{
 			fmt.Sprintf("triggered_by:%s", incoming.Content.Execution.Trigger.User),
 			fmt.Sprintf("pipeline_name:%s", incoming.Content.Execution.Name),
 		}
-		event.Tags = append(event.Tags, metricTags...)
+		metricTags = append(metricTags, event.Tags...)
 
 		duration := incoming.Content.Execution.EndTime.Sub(incoming.Content.Execution.StartTime.Time)
-		err = ddClient.Timing("pipeline.duration", duration, event.Tags, 1)
+		err = ddClient.Timing("pipeline.duration", duration, metricTags, 1)
 
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
@@ -108,7 +125,7 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 		} else {
 			logrus.WithFields(logrus.Fields{
 				"metric":   "pipeline.duration",
-				"tags":     event.Tags,
+				"tags":     metricTags,
 				"duration": duration.Seconds() * 1000,
 			}).Info("submitted metric to datadog")
 		}
