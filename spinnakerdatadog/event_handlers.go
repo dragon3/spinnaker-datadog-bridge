@@ -108,7 +108,7 @@ func (deh *DatadogEventHandler) Handle(incoming *types.IncomingWebhook) error {
 
 	event.Tags = removeDuplicateTags(event.Tags)
 
-	if eventType == "pipeline" && eventStatus == "complete" {
+	if eventType == "pipeline" && (eventStatus == "complete" || eventStatus == "failed") {
 		metricTags := []string{
 			fmt.Sprintf("triggered_by:%s", incoming.Content.Execution.Trigger.User),
 			fmt.Sprintf("pipeline_name:%s", incoming.Content.Execution.Name),
